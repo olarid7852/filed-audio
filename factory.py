@@ -8,7 +8,7 @@ faker = Faker()
 class AudioFactory:
     def __init__(
         self,
-        audio_type=random.choice([AudioTypes.audio_book, AudioTypes.podcast, AudioTypes.song]),
+        audioFileType=random.choice([AudioTypes.audio_book, AudioTypes.podcast, AudioTypes.song]),
         name = faker.name()[:100],
         duration = random.randint(1, 30000),
         uploaded_time = faker.date_time(),
@@ -17,7 +17,7 @@ class AudioFactory:
         narrator = faker.name()[:100],
         participants = [faker.name()[:100] for participants in range(random.randint(1, 100))]
     ):
-        self.audio_type = audio_type
+        self.audioFileType = audioFileType
         self.name = name
         self.duration = duration
         self.uploaded_time = uploaded_time
@@ -27,27 +27,27 @@ class AudioFactory:
         self.participants = participants
 
     def build(self):
-        metadata: Union[AudioBookMetadata, PodcastMetadata, SongMetadata]
+        audioFileMetadata: Union[AudioBookMetadata, PodcastMetadata, SongMetadata]
         base_metadata_dict = BaseMetadata(
             name=self.name,
             duration=self.duration,
             uploaded_time=self.uploaded_time
         ).dict()
-        if self.audio_type == AudioTypes.audio_book:
-            metadata = AudioBookMetadata(
+        if self.audioFileType == AudioTypes.audio_book:
+            audioFileMetadata = AudioBookMetadata(
                 author=self.author,
                 narrator=self.narrator,
                 **base_metadata_dict
             )
-        elif self.audio_type == AudioTypes.podcast:
-            metadata = PodcastMetadata(
+        elif self.audioFileType == AudioTypes.podcast:
+            audioFileMetadata = PodcastMetadata(
                 host=self.host,
                 participants=self.participants,
                 **base_metadata_dict
             )
         else:
-            metadata = SongMetadata(**base_metadata_dict)
-        audio = Audio(audio_type=self.audio_type, metadata=metadata)
+            audioFileMetadata = SongMetadata(**base_metadata_dict)
+        audio = Audio(audioFileType=self.audioFileType, audioFileMetadata=audioFileMetadata)
         return audio
 
 if __name__ == '__main__':

@@ -74,14 +74,14 @@ class AudioBookMetadata(Model, BaseMetadata):
 
 
 class Audio(BaseModel):
-    audio_type: AudioTypes
-    metadata: Union[AudioBookMetadata, PodcastMetadata, SongMetadata,]
+    audioFileType: AudioTypes
+    audioFileMetadata: Union[AudioBookMetadata, PodcastMetadata, SongMetadata,]
 
-    @validator('metadata', pre=True)
-    def metadata_must_be_based_on_type(cls, v, values):
+    @validator('audioFileMetadata', pre=True)
+    def audioFileMetadata_must_be_based_on_type(cls, v, values):
         if type(v) != dict:
             return v
-        audio_type: AudioTypes = values.get('audio_type')
+        audio_type: AudioTypes = values.get('audioFileType')
         if audio_type == AudioTypes.podcast:
             # import pudb; pudb.set_trace()
             return PodcastMetadata(**v)
@@ -98,20 +98,20 @@ class Audio(BaseModel):
     
     def dict(self, *args, **kwargs):
         data = super().dict(*args, **kwargs)
-        if self.metadata.id:
-            data['id'] = str(self.metadata.id)
+        if self.audioFileMetadata.id:
+            data['id'] = str(self.audioFileMetadata.id)
         return data
 
     async def update(self, item: Audio):
-        item_dict = item.metadata.dict(exclude_unset=True)
+        item_dict = item.audioFileMetadata.dict(exclude_unset=True)
         for name, value in item_dict.items():
             if name == 'id':
                 continue
-            setattr(self.metadata, name, value)
-        await engine.save(self.metadata)
+            setattr(self.audioFileMetadata, name, value)
+        await engine.save(self.audioFileMetadata)
     
     async def save(self):
-        self.metadata = await engine.save(self.metadata)
+        self.audioFileMetadata = await engine.save(self.audioFileMetadata)
         return self
     
     @staticmethod
@@ -126,7 +126,7 @@ class Audio(BaseModel):
     @staticmethod
     async def find_all(audio_type: AudioTypes):
         model_class = Audio._get_metadata_class(audio_type)[0]
-        return [Audio(metadata=audio, audio_type=audio_type) for audio in await engine.find(model_class)]
+        return [Audio(audioFileMetadata=audio, audioFileType=audio_type) for audio in await engine.find(model_class)]
     
     @staticmethod
     async def find_by_id(audio_type: AudioTypes, audio_id: bson.ObjectId):
@@ -134,10 +134,10 @@ class Audio(BaseModel):
         audio = await engine.find_one(model_class, id_element == audio_id)
         if not audio:
             raise HTTPException(status_code=404, detail='object not found')
-        return Audio(metadata=audio, audio_type=audio_type)
+        return Audio(audioFileMetadata=audio, audioFileType=audio_type)
     
     @staticmethod
     async def delete_audio(audio_type: AudioTypes, audio_id: bson.ObjectId):
         audio = await Audio.find_by_id(audio_type, audio_id)
-        await engine.delete(audio.metadata)
+        await engine.delete(audio.audioFileMetadata)
         
