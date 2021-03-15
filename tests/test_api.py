@@ -22,7 +22,7 @@ async def test_get_list():
             assert len(data) >= TEST_LENGTH
 
 @pytest.mark.asyncio
-async def test_create_item():
+async def test_create_audio():
     data = AudioFactory().build()
     request_data = json.loads(data.json())
     async with AsyncClient(app=app, base_url="http://test") as ac:
@@ -40,7 +40,7 @@ async def test_create_item():
 
 
 @pytest.mark.asyncio
-async def test_get_item():
+async def test_get_audio():
     data = AudioFactory().build()
     await data.save()
     request_data = json.loads(data.json())
@@ -57,7 +57,7 @@ async def test_get_item():
 
 
 @pytest.mark.asyncio
-async def test_delete_item():
+async def test_delete_audio():
     data = AudioFactory().build()
     await data.save()
     async with AsyncClient(app=app, base_url="http://test") as ac:
@@ -68,7 +68,7 @@ async def test_delete_item():
             await Audio.find_by_id(data.audioFileType, data.audioFileMetadata.id)
 
 @pytest.mark.asyncio
-async def test_create_item():
+async def test_create_audio():
     data = AudioFactory().build()
     await data.save()
     request_data = json.loads(AudioFactory().build().json())
